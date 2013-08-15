@@ -76,6 +76,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -1468,9 +1469,28 @@ public abstract class BaseStatusBar extends SystemUI implements
         return entry.notification;
     }
 
-    private Bitmap createRoundIcon(StatusBarNotification notification) {
+    private void prepareHaloNotification(NotificationData.Entry entry, StatusBarNotification notification) {
 
         Notification notif = notification.getNotification();
+
+        // Get the remote view
+        try {
+            ViewGroup mainView = (ViewGroup)notif.contentView.apply(mContext, null);
+
+
+            for (int i = 0; i < mainView.getChildCount(); i++) {
+                View view = mainView.getChildAt(i);
+                if (view instanceof LinearLayout) {
+                    entry.haloContent = view;
+                    mainView.removeViewAt(i);
+                    break;
+                }
+            }
+
+        } catch (Exception e) {
+            // Non uniform content?
+            android.util.Log.d("PARANOID", "   Non uniform content?");
+        }
 
         // Construct the round icon
         final float haloSize = Settings.System.getFloat(mContext.getContentResolver(),
@@ -1510,8 +1530,8 @@ public abstract class BaseStatusBar extends SystemUI implements
             } catch (Exception e) {
                 // NameNotFoundException
             }
-        }
-        return roundIcon;
+        }        
+        entry.roundIcon = roundIcon;
     }
 
     protected StatusBarIconView addNotificationViews(IBinder key,
@@ -1536,8 +1556,8 @@ public abstract class BaseStatusBar extends SystemUI implements
             return null;
         }
 
-        NotificationData.Entry entry = new NotificationData.Entry(key, notification, iconView,
-                createRoundIcon(notification));
+        NotificationData.Entry entry = new NotificationData.Entry(key, notification, iconView);
+        prepareHaloNotification(entry, notification);
         entry.hide = entry.notification.getPackageName().equals("com.paranoid.halo");
 
         final PendingIntent contentIntent = notification.getNotification().contentIntent;
@@ -1698,7 +1718,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                     oldEntry.floatingIntent = null;
                 }
                 // Update the roundIcon
-                oldEntry.roundIcon = createRoundIcon(notification);
+                prepareHaloNotification(oldEntry, notification);
 
                 // Update the icon.
                 final StatusBarIcon ic = new StatusBarIcon(notification.getPackageName(),
