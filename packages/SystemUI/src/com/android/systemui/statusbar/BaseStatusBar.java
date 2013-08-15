@@ -285,6 +285,9 @@ public abstract class BaseStatusBar extends SystemUI implements
     private RemoteViews.OnClickHandler mOnClickHandler = new RemoteViews.OnClickHandler() {
         @Override
         public boolean onClickHandler(View view, PendingIntent pendingIntent, Intent fillInIntent) {
+
+            android.util.Log.d("PARANOID", "Notification click handler invoked for intent: " + pendingIntent);
+
             if (DEBUG) {
                 Slog.v(TAG, "Notification click handler invoked for intent: " + pendingIntent);
             }
@@ -1469,28 +1472,31 @@ public abstract class BaseStatusBar extends SystemUI implements
         return entry.notification;
     }
 
-    private void prepareHaloNotification(NotificationData.Entry entry, StatusBarNotification notification) {
+    private void prepareHaloNotification(NotificationData.Entry entry, StatusBarNotification notification, boolean update) {
 
         Notification notif = notification.getNotification();
 
         // Get the remote view
         try {
-            ViewGroup mainView = (ViewGroup)notif.contentView.apply(mContext, null);
 
+            if (!update) {
+                ViewGroup mainView = (ViewGroup)notif.contentView.apply(mContext, null, mOnClickHandler);
 
-            for (int i = 0; i < mainView.getChildCount(); i++) {
-                View view = mainView.getChildAt(i);
-                if (view instanceof LinearLayout) {
-                    entry.haloContent = view;
-                    mainView.removeViewAt(i);
-                    break;
+                if (mainView instanceof FrameLayout) {
+                    entry.haloContent = mainView.getChildAt(1);
+                    mainView.removeViewAt(1);
+                } else {
+                    entry.haloContent = mainView;
                 }
+            } else {
+                notif.contentView.reapply(mContext, entry.haloContent, mOnClickHandler);
             }
 
         } catch (Exception e) {
             // Non uniform content?
             android.util.Log.d("PARANOID", "   Non uniform content?");
         }
+
 
         // Construct the round icon
         final float haloSize = Settings.System.getFloat(mContext.getContentResolver(),
@@ -1557,7 +1563,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
 
         NotificationData.Entry entry = new NotificationData.Entry(key, notification, iconView);
-        prepareHaloNotification(entry, notification);
+        prepareHaloNotification(entry, notification, false);
         entry.hide = entry.notification.getPackageName().equals("com.paranoid.halo");
 
         final PendingIntent contentIntent = notification.getNotification().contentIntent;
@@ -1718,7 +1724,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                     oldEntry.floatingIntent = null;
                 }
                 // Update the roundIcon
-                prepareHaloNotification(oldEntry, notification);
+                prepareHaloNotification(oldEntry, notification, true);
 
                 // Update the icon.
                 final StatusBarIcon ic = new StatusBarIcon(notification.getPackageName(),
