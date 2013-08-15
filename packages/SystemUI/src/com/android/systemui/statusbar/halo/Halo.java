@@ -818,7 +818,6 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
 
                             // Tasking hasn't changed, we can tick the message here
                             if (mMarkerIndex == oldIconIndex) {
-                                android.util.Log.d("PARANOID", "if (gestureChanged).ticker("+gestureText+")");
                                 mEffect.ticker(gestureText, 0, 250);
                                 mEffect.updateResources(mTickerLeft);
                                 mEffect.invalidate();
@@ -830,7 +829,6 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
                         mMarkerIndex = -1;
                         if (mGesture != Gesture.NONE) {
                             mEffect.setHaloOverlay(HaloProperties.Overlay.NONE, 0f);
-                            android.util.Log.d("PARANOID", "else {mMarkerIndex = -1}.killTicker()");
                             if (verticalGesture()) mEffect.killTicker();
                         }
                         mGesture = Gesture.NONE;
@@ -846,17 +844,14 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
                         int iconIndex = getHaloMsgIndex(mMarkerIndex, false);
 
                         try {
-
-android.util.Log.d("PARANOID", "iconIndex="+iconIndex);
-
                             if (iconIndex == -1) {
                                 mTaskIntent = null;
                                 resetIcons();
-                                tick(mLastNotificationEntry, 0, 2500, false, true);
+                                tick(mLastNotificationEntry, 0, 10000, false, true);
                             } else {
                                 setIcon(iconIndex);
                                 NotificationData.Entry entry = mNotificationData.get(iconIndex);
-                                tick(entry, 0, 2500, false, true);
+                                tick(entry, 0, 10000, false, true);
                                 mTaskIntent = entry.getFloatingIntent();
                             }
                         } catch (Exception e) {
@@ -1013,7 +1008,7 @@ android.util.Log.d("PARANOID", "iconIndex="+iconIndex);
 
                     PointF point = new PointF();
                     getRawPoint(event, 1, point);
-                    point.x = point.x - (lx + mIconHalfSize);
+                    point.x = point.x - (lx + (int)(mIconHalfSize*0.9f));
                     point.y = point.y - (ly + mIconHalfSize);
                     browseView(point, bla);
                 }
