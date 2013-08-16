@@ -839,7 +839,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
                         oldIconIndex = mMarkerIndex;
 
                         // Make a tiny pop if not so many icons are present
-                        if (mHapticFeedback && getHaloMsgCount() < 10) mVibrator.vibrate(1);
+                        if (mHapticFeedback && getHaloMsgCount() < 10) mVibrator.vibrate(10);
 
                         int iconIndex = getHaloMsgIndex(mMarkerIndex, false);
 
@@ -939,7 +939,6 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
                         (int)(mMarkerB.getHeight() * mHaloSize), true);
             }
 
-
             mMarkerPaint.setAntiAlias(true);
             mMarkerPaint.setAlpha(0);
             xPaint.setAntiAlias(true);
@@ -966,32 +965,35 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
             point.set((int)x,(int)y);
         }
 
-
-        void browseView(PointF loc, View v) {
-
+        boolean browseView(PointF loc, Rect parent, View v) {
             int posX = (int)loc.x;
-            int posY = (int)loc.y;
+            int posY = (int)loc.y - mIconHalfSize / 2;
 
             if (v instanceof ViewGroup) {
                 ViewGroup vg = (ViewGroup)v;
                 for (int i = 0; i < vg.getChildCount(); i++) {
                     View sv = vg.getChildAt(i);
-                    browseView(loc, sv);
+                    if (browseView(loc, parent, sv)) return true;
                 }
             } else {
                 if (v.isClickable()) {
                     Rect r = new Rect();
                     v.getHitRect(r);
 
-                    if (posX > r.left && posX < r.right && posY > r.top && posY < r.bottom) {
-                        android.util.Log.d("PARANOID", "   hit #");
+                    int left = lx + parent.left + r.left;
+                    int top = ly + parent.top + r.top;
+                    int right = lx + parent.left + r.right;
+                    int bottom = ly + parent.top + r.bottom;
+
+                    if (posX > left && posX < right && posY > top && posY < bottom) {
                         v.performClick();
                         playSoundEffect(SoundEffectConstants.CLICK);
                         if (mHapticFeedback) mVibrator.vibrate(25);
-                        return;
+                        return true;
                     }
                 }
             }
+            return false;
         }
 
         @Override
@@ -1001,16 +1003,12 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
                     && event.getActionIndex() == 1 ) {
 
                 if (bla != null) {
-                    /*Rect a = new Rect();
-                    Point b = new Point();
-                    bla.getHitRect(a); 
-                    android.util.Log.d("PARANOID", "   bla l="+a.left+" t="+a.top+" r="+a.right+" b="+a.bottom);*/
-
+                    Rect rootRect = new Rect();
+                    bla.getHitRect(rootRect); 
+                    
                     PointF point = new PointF();
                     getRawPoint(event, 1, point);
-                    point.x = point.x - (lx + (int)(mIconHalfSize*0.9f));
-                    point.y = point.y - (ly + mIconHalfSize);
-                    browseView(point, bla);
+                    browseView(point, rootRect, bla);
                 }
             }
             return false;
@@ -1178,7 +1176,7 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
                 if (mHaloY < mIconHalfSize) {
                     y = y + (int)(mIconSize * 0.40f);
                 } else {
-                    y = y - mIconSize;
+                    y = y - (int)(mIconSize * 1.20f);
                 }
             }
 
@@ -1202,8 +1200,8 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback, TabletTi
                     indexLength = indexLength > 120 ? 120 : indexLength;
 
                     for (int i = 0; i < items; i++) {
-                        float pulseX = mTickerLeft ? (mIconSize * 1.25f + indexLength * i)
-                                : (mScreenWidth - mIconSize * 1.25f - indexLength * i - mMarker.getWidth());
+                        float pulseX = mTickerLeft ? (mIconSize * 1.3f + indexLength * i)
+                                : (mScreenWidth - mIconSize * 1.3f - indexLength * i - mMarker.getWidth());
                         boolean markerState = mTickerLeft ? mMarkerIndex >= 0 && i < items-mMarkerIndex : i <= mMarkerIndex;
                         mMarkerPaint.setAlpha(markerState ? 255 : 100);
                         canvas.drawBitmap(mMarker, pulseX, pulseY, mMarkerPaint);

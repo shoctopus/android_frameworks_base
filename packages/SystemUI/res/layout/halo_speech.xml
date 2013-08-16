@@ -3,26 +3,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content" >
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
-    <RelativeLayout
-        android:id="@+id/ticker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <RelativeLayout
+            android:id="@+id/ticker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/bubble"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:singleLine="false"
-        android:maxLines = "3"
-        android:textColor="#fff"
-        android:visibility="gone"             
-        android:textSize="@dimen/halo_speech_text_size"/>
+        <TextView
+            android:id="@+id/bubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="false"
+            android:maxLines = "3"
+            android:textColor="#fff"
+            android:visibility="gone"             
+            android:textSize="@dimen/halo_speech_text_size" />
 
     </RelativeLayout>
 
