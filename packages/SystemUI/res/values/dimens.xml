@@ -254,10 +254,10 @@
     <dimen name="halo_number_icon_size">18dp</dimen>
     <dimen name="halo_number_text_size">14sp</dimen>
     <dimen name="halo_speech_text_size">14sp</dimen>
-    <dimen name="halo_speech_hpadding_short">8dp</dimen>
-    <dimen name="halo_speech_hpadding_wide">12dp</dimen>
-    <dimen name="halo_speech_vpadding_top">4dp</dimen>
-    <dimen name="halo_speech_vpadding_bottom">4dp</dimen>
+    <dimen name="halo_speech_hpadding_short">4dp</dimen>
+    <dimen name="halo_speech_hpadding_wide">13dp</dimen>
+    <dimen name="halo_speech_vpadding_top">3dp</dimen>
+    <dimen name="halo_speech_vpadding_bottom">3dp</dimen>
     <dimen name="halo_content_max_width">250dp</dimen>
 
 </resources>
