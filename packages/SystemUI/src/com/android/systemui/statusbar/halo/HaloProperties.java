@@ -72,6 +72,7 @@ public class HaloProperties extends FrameLayout {
     protected int mHaloX = 0, mHaloY = 0;
     protected int mHaloContentY = 0;
     protected float mHaloContentAlpha = 0;
+    private int mHaloContentHeight = 0;
 
     private Drawable mHaloDismiss;
     private Drawable mHaloBackL;
@@ -144,6 +145,8 @@ public class HaloProperties extends FrameLayout {
         mHaloSystemIcon.setImageDrawable(mContext.getResources().getDrawable(R.drawable.halo_system_message));
         mHaloPinned = (ImageView) mHaloNumberView.findViewById(R.id.pinned);
         mHaloPinned.setImageDrawable(mContext.getResources().getDrawable(R.drawable.halo_pinned_app));
+
+        mHaloContentHeight = mContext.getResources().getDimensionPixelSize(R.dimen.notification_min_height);
 
         mFraction = Settings.System.getFloat(mContext.getContentResolver(),
                 Settings.System.HALO_SIZE, 1.0f);
@@ -280,9 +283,9 @@ public class HaloProperties extends FrameLayout {
     }
 
     public void setHaloContentAlpha(float value) {
-        mHaloTickerContent.setAlpha(value);
+        mHaloTickerWrapper.setAlpha(value);
         mHaloTextView.setTextColor(mHaloTextView.getTextColors().withAlpha((int)(value * 255)));
-        mHaloTickerContent.invalidate();
+        mHaloTickerWrapper.invalidate();
         mHaloContentAlpha = value;
     }
 
@@ -346,27 +349,31 @@ public class HaloProperties extends FrameLayout {
             // Set background
             switch(style) {
                 case CONTENT_UP:
-                    mHaloTickerContent.setBackground(contentLeft ? mHaloSpeechL : mHaloSpeechR);
+                    mHaloTickerWrapper.setBackground(contentLeft ? mHaloSpeechL : mHaloSpeechR);
                     break;
                 case CONTENT_DOWN:
-                    mHaloTickerContent.setBackground(contentLeft ? mHaloSpeechLD : mHaloSpeechRD);
+                    mHaloTickerWrapper.setBackground(contentLeft ? mHaloSpeechLD : mHaloSpeechRD);
                     break;
             }
 
             // ... and override its padding
             if (contentLeft) {
-                mHaloTickerContent.setPadding(newPaddingHWide, newPaddingVTop, newPaddingHShort, newPaddingVBottom);
+                mHaloTickerWrapper.setPadding(newPaddingHWide, newPaddingVTop, newPaddingHShort, newPaddingVBottom);
             } else {
-                mHaloTickerContent.setPadding(newPaddingHShort, newPaddingVTop, newPaddingHWide, newPaddingVBottom);
+                mHaloTickerWrapper.setPadding(newPaddingHShort, newPaddingVTop, newPaddingHWide, newPaddingVBottom);
             }
 
             mLastContentStyle = style;
         }
     }
 
+    public void setHaloContentHeight(int size) {
+        mHaloContentHeight = size;
+    }
+
     public void updateResources(boolean contentLeft) {
-        final int minHeight = mContext.getResources().getDimensionPixelSize(R.dimen.notification_min_height);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, minHeight);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, mHaloContentHeight);
         mHaloTickerWrapper.setLayoutParams(layoutParams);
 
         // Set background and override its padding
@@ -392,7 +399,7 @@ public class HaloProperties extends FrameLayout {
         if (mHaloTickerWrapper.getMeasuredWidth() > maximumWidth) {
             final int optimalWidth = iconSize * 5;
             final int newSize = maximumWidth > optimalWidth ? optimalWidth : maximumWidth;        
-            layoutParams = new LinearLayout.LayoutParams(newSize, minHeight);
+            layoutParams = new LinearLayout.LayoutParams(newSize, mHaloContentHeight);
             mHaloTickerWrapper.setLayoutParams(layoutParams);
 
             mHaloContentView.measure(MeasureSpec.getSize(mHaloContentView.getMeasuredWidth()),

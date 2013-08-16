@@ -1472,7 +1472,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         return entry.notification;
     }
 
-    private void prepareHaloNotification(NotificationData.Entry entry, StatusBarNotification notification, boolean update) {
+    public void prepareHaloNotification(NotificationData.Entry entry, StatusBarNotification notification, boolean update) {
 
         Notification notif = notification.getNotification();
 
