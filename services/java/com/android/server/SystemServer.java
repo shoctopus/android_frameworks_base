@@ -746,17 +746,17 @@ class ServerThread extends Thread {
             }
 
             try {
-                Slog.i(TAG, "IdleMaintenanceService");
-                new IdleMaintenanceService(context, battery);
-            } catch (Throwable e) {
-                reportWtf("starting IdleMaintenanceService", e);
-            }
-
-            try {
                 Slog.i(TAG, "AssetRedirectionManager Service");
                 ServiceManager.addService("assetredirection", new AssetRedirectionManagerService(context));
             } catch (Throwable e) {
                 Slog.e(TAG, "Failure starting AssetRedirectionManager Service", e);
+            }
+
+            try {
+                Slog.i(TAG, "IdleMaintenanceService");
+                new IdleMaintenanceService(context, battery);
+            } catch (Throwable e) {
+                reportWtf("starting IdleMaintenanceService", e);
             }
         }
 
