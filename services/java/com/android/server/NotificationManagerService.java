@@ -1688,9 +1688,6 @@ public class NotificationManagerService extends INotificationManager.Stub
             mPolicyFile.delete();
         }
 
-        LEDSettingsObserver ledObserver = new LEDSettingsObserver(mHandler);
-        ledObserver.observe();
-
         ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
     }
 
